@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CRUD - Quotes Generator</title>
+    <style>
+        body {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>CRUD with Firebase</h1>
+
+    <h2>Create</h2>
+    <form id="create-form">
+        <label for="create-content">Content:</label>
+        <input type="text" id="create-content">
+        <br>
+        <label for="create-source">Source:</label>
+        <input type="text" id="create-source">
+        <br>
+        <label for="create-rating">Rating:</label>
+        <input type="number" id="create-rating">
+        <br>
+        <label for="create-media">Media:</label>
+        <input type="text" id="create-media">
+        <br>
+        <label for="create-day-period">Day Period:</label>
+        <input type="text" id="create-day-period">
+        <br>
+        <button type="submit">Create</button>
+    </form>
+
+    <h2>List</h2>
+    <ul id="read-list"></ul>
+
+    <h2>Update</h2>
+    <form id="update-form">
+        <label for="update-id">ID:</label>
+        <input type="text" id="update-id">
+        <br>
+        <label for="update-content">Content:</label>
+        <input type="text" id="update-content">
+        <br>
+        <label for="update-source">Source:</label>
+        <input type="text" id="update-source">
+        <br>
+        <label for="update-rating">Rating:</label>
+        <input type="number" id="update-rating">
+        <br>
+        <label for="update-media">Media:</label>
+        <input type="text" id="update-media">
+        <br>
+        <label for="update-day-period">Day Period:</label>
+        <input type="text" id="update-day-period">
+        <br>
+        <button type="submit">Update</button>
+    </form>
+
+    <h2>Delete</h2>
+    <form id="delete-form">
+        <label for="delete-id">ID:</label>
+        <input type="text" id="delete-id">
+        <br>
+        <button type="submit">Delete</button>
+    </form>
+
+    <script src="https://www.gstatic.com/firebasejs/7.21.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.21.1/firebase-database.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyASkJSSf70bzWBPrJRiDE1Esq3tje1jvrk",
+            authDomain: "quotes-gpt.firebaseapp.com",
+            databaseURL: "https://quotes-gpt-default-rtdb.firebaseio.com",
+            projectId: "quotes-gpt",
+            storageBucket: "quotes-gpt.appspot.com",
+            messagingSenderId: "536949892391",
+            appId: "1:536949892391:web:a737d5c301105c127eb502"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
+        // Create
+        var createForm = document.getElementById('create-form');
+        createForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var content = document.getElementById('create-content').value;
+            var source = document.getElementById('create-source').value;
+            var rating = document.getElementById('create-rating').value;
+            var media = document.getElementById('create-media').value;
+            var dayPeriod = document.getElementById('create-day-period').value;
+            var newQuoteKey = firebase.database().ref().child('quotes').push().key;
+            firebase.database().ref('quotes/' + newQuoteKey).set({
+                content: content,
+                source: source,
+                rating: rating,
+                media: media,
+                'day-period': dayPeriod
+            });
+        });
+
+        // Read
+        var readList = document.getElementById('read-list');
+        firebase.database().ref('quotes').on('value', function (snapshot) {
+            readList.innerHTML = '';
+            snapshot.forEach(function (childSnapshot) {
+                var quote = childSnapshot.val();
+                var li = document.createElement('li');
+                li.innerHTML = quote.content + ' (' + quote.source + ')';
+
+                // Create "Edit" button
+                var editButton = document.createElement('button');
+                editButton.innerHTML = 'Edit';
+                editButton.addEventListener('click', function () {
+                    // Populate update form with quote data
+                    document.getElementById('update-id').value = childSnapshot.key;
+                    document.getElementById('update-content').value = quote.content;
+                    document.getElementById('update-source').value = quote.source;
+                    document.getElementById('update-rating').value = quote.rating;
+                    document.getElementById('update-media').value = quote.media;
+                    document.getElementById('update-day-period').value = quote['day-period'];
+                });
+                li.appendChild(editButton);
+
+                readList.appendChild(li);
+            });
+        });
+
+        // Update
+        var updateForm = document.getElementById('update-form');
+        updateForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var id = document.getElementById('update-id').value;
+            var content = document.getElementById('update-content').value;
+            var source = document.getElementById('update-source').value;
+            var rating = document.getElementById('update-rating').value;
+            var media = document.getElementById('update-media').value;
+            var dayPeriod = document.getElementById('update-day-period').value;
+            firebase.database().ref('quotes/' + id).set({
+                content: content,
+                source: source,
+                rating: rating,
+                media: media,
+                'day-period': dayPeriod
+            });
+        });
+
+        // Delete
+        var deleteForm = document.getElementById('delete-form');
+        deleteForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var id = document.getElementById('delete-id').value;
+            firebase.database().ref('quotes/' + id).remove();
+        });
+    </script>
+</body>
+
+</html>
