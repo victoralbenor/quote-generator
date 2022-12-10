@@ -48,9 +48,9 @@
         <p class="quote-source"></p>
     </div>
     <div class="rating-buttons">
-        <button type="button" id="downvoteButton" onclick="downvote()">👎</button>
-        <button type="button" id="refreshButton" onclick="newQuote()">🔄</button>
-        <button type="button" id="upvoteButton" onclick="upvote()">👍</button>
+        <button onclick="increaseRating(-1)" type="button" id="downvoteButton" onclick="downvote()">👎</button>
+        <button onclick="showRandomQuote()" type="button" id="refreshButton" onclick="newQuote()">🔄</button>
+        <button onclick="increaseRating(1)" type="button" id="upvoteButton" onclick="upvote()">👍</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
