@@ -111,7 +111,14 @@
             snapshot.forEach(function (childSnapshot) {
                 var quote = childSnapshot.val();
                 var li = document.createElement('li');
-                li.innerHTML = quote.content + ' (' + quote.source + ')';
+
+                // Defines the content of the list item
+                li.innerHTML = `ID: ${childSnapshot.key} <br>
+                                Content: ${quote.content} <br>
+                                Source: ${quote.source} <br>
+                                Rating: ${quote.rating} <br>
+                                Media: ${quote.media} <br>
+                                Day Period: ${quote['day-period']} <br>`;
 
                 // Create "Edit" button
                 var editButton = document.createElement('button');
@@ -124,8 +131,12 @@
                     document.getElementById('update-rating').value = quote.rating;
                     document.getElementById('update-media').value = quote.media;
                     document.getElementById('update-day-period').value = quote['day-period'];
+                    const updateForm = document.getElementById("update-form");
+                    updateForm.scrollIntoView();
                 });
                 li.appendChild(editButton);
+                li.appendChild(document.createElement("br"));
+                li.appendChild(document.createElement("br"));
 
                 readList.appendChild(li);
             });
