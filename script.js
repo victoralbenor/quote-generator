@@ -12,7 +12,7 @@ const quotesRef = db.ref("quotes");
 let quoteIndex = "";
 
 // displays first quote on page load
-showRandomQuote();
+showWeightedRandomQuote();
 
 // function to update the page with a new random quote
 function showRandomQuote() {
@@ -34,6 +34,43 @@ function showRandomQuote() {
             quoteIndex = randomQuoteRef.key;
 
             // update the page with the quote content and source
+            document.querySelector(".quote-content").textContent = quoteData.content;
+            document.querySelector(".quote-source").textContent = quoteData.source;
+        });
+    });
+}
+
+// function to update the page with a new random quote using weighted random
+function showWeightedRandomQuote() {
+    // get the sum of all ratings
+    let ratingSum = 0;
+    quotesRef.once("value", snapshot => {
+        snapshot.forEach(quoteSnapshot => {
+            const quoteData = quoteSnapshot.val();
+            ratingSum += parseInt(quoteData.rating);
+        });
+
+        // generate a random number between 0 and the sum of ratings
+        const randomNumber = parseInt(Math.random() * ratingSum);
+
+        // iterate over each quote to find the one with a range of ratings that includes the random number
+        let runningTotal = 0;
+        let chosenQuote;
+        quotesRef.once("value", snapshot => {
+            let shouldSkip = false;
+            snapshot.forEach(quoteSnapshot => {
+                if (shouldSkip) return; // DEBT: this is a hack to stop iterating over quotes. It could be improved.
+                const quoteData = quoteSnapshot.val();
+                runningTotal += parseInt(quoteData.rating);
+                if (parseInt(randomNumber) <= parseInt(runningTotal)) {
+                    // found the quote with the matching range of ratings
+                    chosenQuote = quoteSnapshot;
+                    shouldSkip = true; // stop iterating over quotes
+                }
+            });
+
+            // update the page with the quote content and source
+            const quoteData = chosenQuote.val();
             document.querySelector(".quote-content").textContent = quoteData.content;
             document.querySelector(".quote-source").textContent = quoteData.source;
         });
